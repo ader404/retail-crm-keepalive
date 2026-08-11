@@ -1,0 +1,29 @@
+name: Keep Render Alive
+
+on:
+  schedule:
+    # Runs every 14 minutes to prevent Render from sleeping
+    - cron: '*/14 * * * *'
+  workflow_dispatch:
+    # Allows manual trigger from the Actions tab
+
+jobs:
+  ping-services:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Ping Backend Service
+        run: |
+          echo "⏰ Pinging backend at $(date)"
+          curl -s -o /dev/null -w "Backend Status: %{http_code}\n" \
+            https://retail-crm-backend.onrender.com/health
+      
+      - name: Ping Frontend Service
+        run: |
+          echo "⏰ Pinging frontend at $(date)"
+          curl -s -o /dev/null -w "Frontend Status: %{http_code}\n" \
+            https://retail-crm-frontend.onrender.com/
+      
+      - name: Check if services are alive
+        run: |
+          echo "✅ Keep-alive ping completed at $(date)"
